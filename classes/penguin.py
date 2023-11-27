@@ -132,7 +132,7 @@ class Penguin(pygame.sprite.Sprite):
 
     def snowball_key_press_check(self):
         pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[pygame.K_t]:
+        if pressed_keys[pygame.K_t] or pygame.mouse.get_pressed()[2]:
             self.gathering_snowball = True
             self.walking = False
             self.is_aiming = False
