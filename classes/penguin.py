@@ -137,7 +137,6 @@ class Penguin(pygame.sprite.Sprite):
             self.walking = False
             self.is_aiming = False
             self.animation_index = 0
-            pygame.mouse.set_cursor((20, 20), self.aiming_cursor)
 
     def snowball_orient(self):
         if self.mouse_angle <= 85:
@@ -170,6 +169,7 @@ class Penguin(pygame.sprite.Sprite):
             self.animation_index = 0
             self.gathering_snowball = False
             self.is_aiming = True
+            pygame.mouse.set_cursor((20, 20), self.aiming_cursor)
 
 
     def aiming(self):
@@ -195,10 +195,16 @@ class Penguin(pygame.sprite.Sprite):
 
             
     def click_check(self):
-        if pygame.mouse.get_pressed()[0] and not self.gathering_snowball and not self.throwing_snowball:
+        if pygame.mouse.get_pressed()[0]:
+            pygame.mouse.set_cursor(pygame.cursors.arrow)
+            self.gathering_snowball = False
+            self.throwing_snowball = False
             self.mouse_clicked = True
-        elif self.mouse_clicked == True and not self.gathering_snowball and not self.throwing_snowball:
+            self.animation_index = 0
+            self.current_snowball_animation = None
+        elif self.mouse_clicked == True:
             self.mouse_clicked = False
+            self.click_pos = pygame.mouse.get_pos()
             if self.is_aiming == True:
                 self.throwing_snowball = True
                 self.is_aiming = False
@@ -218,22 +224,23 @@ class Penguin(pygame.sprite.Sprite):
                         start_x += 2
                     self.current_snowball_animation = self.snowball_animations[3]
 
-                Snowball_Shadow(self.snowballs, (start_x, start_y), pygame.mouse.get_pos(), self.mouse_angle, self.flip)
-                Snowball(self.snowballs, (start_x, start_y), pygame.mouse.get_pos(), self.mouse_angle, self.flip)
+                Snowball_Shadow(self.snowballs, (start_x, start_y), self.click_pos, self.mouse_angle, self.flip)
+                Snowball(self.snowballs, (start_x, start_y), self.click_pos, self.mouse_angle, self.flip)
 
             else:
-                self.click_pos = pygame.mouse.get_pos()
                 self.orient()
                 self.face_mouse()
                 self.walking = True
                 self.animation_index = 0
 
     def update(self):
+        self.click_check()
+
         if self.rect_correct:
             self.rect.x -= self.x_shift
             self.rect.y -= self.y_shift
             self.rect_correct = False
-        self.click_check()
+        
         if self.throwing_snowball:
             self.throw_snowball()
         else:
@@ -242,9 +249,9 @@ class Penguin(pygame.sprite.Sprite):
                 self.aiming()
             elif self.gathering_snowball:
                 self.snowball_animation()
-            elif not self.walking:
-                self.orient()
-                self.face_mouse()
-            else:
+            elif self.walking:
                 self.animate_walking()
                 self.move()
+            else:
+                self.orient()
+                self.face_mouse()
