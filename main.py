@@ -1,4 +1,5 @@
 from classes.penguin import Penguin
+from classes.snowball_obstacle import Snowball_Obstacle
 import pygame
 from sys import exit
 
@@ -19,6 +20,10 @@ player = pygame.sprite.GroupSingle()
 player.add(Penguin(mouse_has_moved, snowballs))
 player_sprite = player.sprite
 
+obstacles = pygame.sprite.Group()
+
+obstacle_timer = 0
+timer_increment = 0.01
 
 while True:
     for event in pygame.event.get():
@@ -28,6 +33,8 @@ while True:
         if event.type == pygame.MOUSEMOTION and not mouse_has_moved:
             player_sprite.mouse_moved()
             mouse_has_moved = True
+
+    
 
     screen.blit(background, (0,0))
     snowballs.update()
